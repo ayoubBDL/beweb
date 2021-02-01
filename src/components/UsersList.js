@@ -9,7 +9,7 @@ class UsersList extends Component{
     }
     
     fetchUsers = () => {
-        fetch('http://localhost/php-react/all-users.php')
+        fetch('http://localhost/api/all-users.php')
         .then(response => {
             response.json().then(function(data) {
                 if(data.success === 1){
@@ -29,21 +29,22 @@ class UsersList extends Component{
 
     componentDidMount(){
         this.fetchUsers();
+        console.log(this.context)
     }
 
     handleUpdate = (id) => {
-        Axios.post('http://localhost/php-react/update-user.php',
+        Axios.post('http://localhost/api/update-user.php',
         {
             id:id,
-            user_name:this.name.value,
-            user_email:this.email.value
+            name:this.name.value,
+            email:this.email.value
         })
         .then(({data}) => {
             if(data.success === 1){
                 let users = this.state.users.map(user => {
                     if(user.id === id){
-                        user.user_name = this.name.value;
-                        user.user_email = this.email.value;
+                        user.name = this.name.value;
+                        user.email = this.email.value;
                         user.isEditing = false;
                         return user;
                     }
@@ -99,7 +100,7 @@ class UsersList extends Component{
             return user.id !== id;
         });
         
-        Axios.post('http://localhost/php-react/delete-user.php',{
+        Axios.post('http://localhost/api/delete-user.php',{
             id:id
         })
         .then(({data}) => {
@@ -133,12 +134,12 @@ class UsersList extends Component{
 
     render(){
 
-        let allUsers = this.state.users.map(({id,user_name,user_email,isEditing}, index) => {
+        let allUsers = this.state.users.map(({id,name,email,isEditing}, index) => {
             
             return isEditing === true ? (   
             <tr key={id}>
-                <td><input className="form-control" type="text" ref={(item) => this.name = item} defaultValue={user_name}/></td>
-                <td><input className="form-control" type="email" ref={(item) => this.email = item} defaultValue={user_email}/></td>
+                <td><input className="form-control" type="text" ref={(item) => this.name = item} defaultValue={name}/></td>
+                <td><input className="form-control" type="email" ref={(item) => this.email = item} defaultValue={email}/></td>
                 <td>
                     <button className="btn btn-success mr-2" onClick={() => this.handleUpdate(id)}>Save</button>
                     <button onClick={() => this.cancleEdit(id)} className="btn btn-light">Cancel</button>
@@ -147,8 +148,8 @@ class UsersList extends Component{
             ):
             ( 
                 <tr key={id}>
-                    <td>{user_name}</td>
-                    <td>{user_email}</td>
+                    <td>{name}</td>
+                    <td>{email}</td>
                     <td>
                         <button className="btn btn-dark mr-2" onClick={() => this.editMode(id)}>Edit</button>
                         <button onClick={() => this.handleDelete(id)} className="btn btn-danger">Delete</button>
